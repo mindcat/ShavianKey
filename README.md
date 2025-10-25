@@ -66,7 +66,7 @@ SW2b:
       - [ ] READ [this great description of a spell checker](https://www.norvig.com/spell-correct.html) and [this implementation in swift](https://airspeedvelocity.net/2015/05/02/spelling/)
       - [ ] now make it, native to swift. NEED RELIABLE DICT FIRST
   - [ ] Predictive text
-    - [ ] Trie's for shavian words with frequency attached to any leaves
+    - [ ] Trie's for shavian words with frequency attached to any leaves [helpful blog post?](https://holyswift.app/trie-in-swift-autocorrect-data-structure-now-you-know-what-to-blame/)
   - [ ] Dictionary (used by both predictions & autocorrect)
     - [ ] Text corpus in Shavian for word frequency?
     - [ ] Organized by relevance
@@ -82,5 +82,6 @@ SW2b:
   - [ ] Some settings options in main app window
     - [ ] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
        
+
 
 
