@@ -44,6 +44,7 @@ SW2b:
     - [x] Fix that
     - [x] Works on form factors that aren't my iPhone 12 mini
     - [x] Fixed that, now dealing with not enough vertical space?.. (fixed, needed to adjust padding post-refactor)
+    - [x] I was so wrong and had to do a horrific amount of refactoring because just getting an accurate frame width at init is apparently too much
   - [x] Liquid Glass icon with icon composer
   - [ ] REFACTOR from the keymaps being held in individual arrays for each submode to SINGLE dictionary that encodes the character pair relationships
     - e.g.  for QWERTY (a -> A), Shavian (𐑐 -> 𐑚), Nums (1 -> !). This will make altering the keymap infinitely easier
@@ -53,7 +54,8 @@ SW2b:
     - [x] When held brings up small mode picker for Shavian/Numbers & Symbols/QWERTY boards
       - [x] Refactor switcher so it works as a drag gesture when held that autoselects 'button'
             where you 'un-tap' like how diacretics and punctuation works in the native ios KB
-      - [ ] SOMETIMES tapping and double tapping does not work UNTIL you use the mode picker
+      - [x] SOMETIMES (always at start-up, not ideal) tapping and double tapping does not work UNTIL you use the mode picker
+    - [ ] The mode switcher placement needs to behave smartly across different displays (optimized for 12 mini)
   - [ ] QWERTY mode
     - [x] You can type in CAPS, and use backspace
     - [ ] Add spacebar
@@ -84,8 +86,9 @@ SW2b:
     - [ ] Dechifro or Ormin's transliterator?? Which is most easily rewritten in Swift and has a minimum of dependencies?
   - [ ] Some settings options in main app window
     - [ ] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
-       
-
+    - [ ] Let user choose whether to have SPC-DEL or DEL-SPC      
+    - [ ] Maybe let user turn off QWERTY mode? or switch it to colemak
+    - [ ] 
 
 
 

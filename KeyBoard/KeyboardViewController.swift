@@ -68,13 +68,15 @@ struct KeyboardView: View {
     let switchAction: () -> Void
     
     // key width
+    @State private var hz_padding: CGFloat = 6
+    @State private var top_padding: CGFloat = 6
     @State private var spacing: CGFloat = 4
-    @State private var keyWidth1x: CGFloat = 35
-    @State private var keyWidth2x: CGFloat = (35 * 2) + 4
+    @State private var keyWidth1x: CGFloat = 10
+    @State private var keyWidth2x: CGFloat = 10
     
     @State private var currentMode: KeyboardMode = .shavian1
     @State private var showingModePicker = false
-    @State private var lastTapTime: Date = Date()
+    @State private var lastTapTime: Date = Date.distantPast
     @State private var lastTapButton: String = ""
     @State private var longPressLocation: CGPoint = .zero
     @State private var isDeleting = false
@@ -127,8 +129,9 @@ struct KeyboardView: View {
     var body: some View {
         ZStack {
             keyboardLayout
-                .padding(.horizontal, 3)
-                .padding(.top, 15)
+                .padding(.horizontal, hz_padding)
+                .padding(.top, top_padding)
+                .frame(maxWidth: .infinity)
                 .background(
                     GeometryReader { geo in
                         Color.clear
@@ -153,6 +156,7 @@ struct KeyboardView: View {
                 .allowsHitTesting(false)
             }
         }
+        .frame(maxWidth: .infinity)
     }
     
     @ViewBuilder
@@ -243,7 +247,7 @@ struct KeyboardView: View {
             HStack(spacing: spacing) {
                 ForEach(0..<10, id: \.self) { i in
                     keyButton(keys[i], alternateKey: mode == .shavian1 ? shavian1bKeys[i] : shavian1aKeys[i])
-                        .frame(maxWidth: .infinity)
+                        .frame(width: keyWidth1x)
                 }
             }
             .frame(height: 42)
@@ -252,7 +256,7 @@ struct KeyboardView: View {
             HStack(spacing: spacing) {
                 ForEach(10..<20, id: \.self) { i in
                     keyButton(keys[i], alternateKey: mode == .shavian1 ? shavian1bKeys[i] : shavian1aKeys[i])
-                        .frame(maxWidth: .infinity)
+                        .frame(width: keyWidth1x)
                 }
             }
             .frame(height: 42)
@@ -310,7 +314,7 @@ struct KeyboardView: View {
             HStack(spacing: 4) {
                 ForEach(0..<10, id: \.self) { i in
                     keyButton(keys[i], alternateKey: mode == .symbols1 ? symbols2bKeys[i] : symbols2aKeys[i])
-                        .frame(maxWidth: .infinity)
+                        .frame(width: keyWidth1x)
                 }
             }
             .frame(height: 42)
@@ -319,7 +323,7 @@ struct KeyboardView: View {
             HStack(spacing: 4) {
                 ForEach(10..<20, id: \.self) { i in
                     keyButton(keys[i], alternateKey: mode == .symbols1 ? symbols2bKeys[i] : symbols2aKeys[i])
-                        .frame(maxWidth: .infinity)
+                        .frame(width: keyWidth1x)
                 }
             }
             .frame(height: 42)
@@ -357,53 +361,39 @@ struct KeyboardView: View {
     // ARRAY BASED LAYOUT TO DICT BASED (paired characters for mapping alternates, including
     // qwerty => QWERTY and # => $)
     private func qwertyLayout() -> some View {
-        GeometryReader { geo in
-            let spacing: CGFloat = 4
-            // Row 1 (10 keys) is our base
-            let keyWidth1x = floor((geo.size.width - 9 * spacing) / 10)
-            // Row 2 has 9 keys, needs padding
-//            let row2Padding = (keyWidth1x + spacing) / 2.0
-            // Row 3 (Shift + 7 keys + Del) has 9 items, 8 gaps
-            let keyWidthShift = floor((geo.size.width - (8 * spacing) - (7 * keyWidth1x)) / 2)
-            // Row 4 (Switch + Space + Return) has 3 items, 2 gaps
-            let keyWidthSpace = floor(geo.size.width - (2 * spacing) - (2 * keyWidthShift))
-            
-            VStack(spacing: 6) {
-                // Row 1
-                HStack(spacing: spacing) {
-                    ForEach(["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], id: \.self) { key in
-                        keyButton(key, alternateKey: nil)
-                            .frame(width: keyWidth1x)
-                    }
-                }
-                .frame(height: 42)
-                
-                // Row 2
-                HStack(spacing: spacing) {
-//                    Spacer().frame(width: row2Padding)
-                    switchButton()
+        VStack(spacing: 6) {
+            // Row 1
+            HStack(spacing: spacing) {
+                ForEach(["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], id: \.self) { key in
+                    keyButton(key, alternateKey: nil)
                         .frame(width: keyWidth1x)
-                    ForEach(["A", "S", "D", "F", "G", "H", "J", "K", "L"], id: \.self) { key in
-                        keyButton(key, alternateKey: nil)
-                            .frame(width: keyWidth1x)
-                    }
-//                    Spacer().frame(width: row2Padding)
                 }
-                .frame(height: 42)
-                
-                // Row 3
-                HStack(spacing: spacing) {
-                    shiftButton()
-                        .frame(width: keyWidthShift)
-                    ForEach(["Z", "X", "C", "V", "B", "N", "M"], id: \.self) { key in
-                        keyButton(key, alternateKey: nil)
-                            .frame(width: keyWidth1x)
-                    }
-                    deleteButton()
-                        .frame(width: keyWidthShift)
-                }
-                .frame(height: 42)
             }
+            .frame(height: 42)
+            
+            // Row 2
+            HStack(spacing: spacing) {
+                switchButton()
+                    .frame(width: keyWidth1x)
+                ForEach(["A", "S", "D", "F", "G", "H", "J", "K", "L"], id: \.self) { key in
+                    keyButton(key, alternateKey: nil)
+                        .frame(width: keyWidth1x)
+                }
+            }
+            .frame(height: 42)
+            
+            // Row 3
+            HStack(spacing: spacing) {
+                shiftButton()
+                    .frame(width: keyWidth1x) // Use @State var
+                ForEach(["Z", "X", "C", "V", "B", "N", "M"], id: \.self) { key in
+                    keyButton(key, alternateKey: nil)
+                        .frame(width: keyWidth1x) // Use @State var
+                }
+                deleteButton()
+                    .frame(width: keyWidth1x) // Use @State var
+            }
+            .frame(height: 42)
         }
     }
     
@@ -412,9 +402,9 @@ struct KeyboardView: View {
     private func updateKeyWidths(for width: CGFloat) {
         guard width > 0 else { return }
         
-        let widthFrame = width // 375 for 12mini, 402 for 17... ANNOYING
+        let widthFrame = width - (hz_padding * 2) // 375 for 12mini, 402 for 17... ANNOYING
         let cellNumber = 10
-        let spacers = spacing * CGFloat((cellNumber + 1))
+        let spacers = spacing * CGFloat((cellNumber - 1))
         let keyTotalWidth = widthFrame - spacers
         
         let cellWidth: CGFloat = keyTotalWidth / CGFloat(cellNumber)
@@ -427,7 +417,7 @@ struct KeyboardView: View {
             handleKeyTap(key, alternateKey: alternateKey)
         }) {
             Text(key)
-                .font(key.count == 1 && key.first?.isLetter == true ? .custom("InterAlia-Regular", size: 22) : .system(size: 20)) // Use system font for symbols
+                .font(key.count == 1 && key.first?.isLetter == true ? .custom("InterAlia-Regular", size: 22) : .system(size: 20)) // not positive interalia is actually being used honestly
                 .foregroundColor(colorScheme == .dark ? .white : .black)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -441,18 +431,10 @@ struct KeyboardView: View {
             .font(.system(size: 16))
             .foregroundColor(colorScheme == .dark ? .white : .black)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                GeometryReader { geo in
-                    Color.clear.onAppear {
-                        self.switchButtonFrame = geo.frame(in: .global)
-                    }
-                }
-                .background(keyButtonStyle)
-            )
+            .background(keyButtonStyle)
             .gesture(
                 DragGesture(minimumDistance: 0, coordinateSpace: .global)
                     .onChanged { value in
-                        // drag start
                         if self.gestureDragLocation == nil {
                             self.gestureDragLocation = value.startLocation
                             
@@ -465,7 +447,6 @@ struct KeyboardView: View {
                             }
                         }
 
-                        // during drag move
                         self.gestureDragLocation = value.location
                         
                         if showingModePicker {
@@ -488,9 +469,6 @@ struct KeyboardView: View {
                         }
                     }
                     .onEnded { value in
-                        // on drag end, can't believe there wasnt an out of the box solution for this jesus
-                        
-                        // not necessary if my code is clean. alas!
                         longPressTimer?.invalidate()
                         longPressTimer = nil
                         
@@ -504,12 +482,12 @@ struct KeyboardView: View {
                             }
                             
                         } else {
-                            if switchButtonFrame.contains(value.location) {
+                            let distance = hypot(value.translation.width, value.translation.height)
+                            if distance < 10 {
                                 handleSwitchTap()
                             }
                         }
                         
-                        // reset
                         self.gestureDragLocation = nil
                         self.highlightedMode = nil
                         self.buttonFrames.removeAll()
@@ -582,7 +560,7 @@ struct KeyboardView: View {
                 DragGesture(minimumDistance: 30)
                     .onEnded { value in
                         let translation = value.translation
-                        if abs(translation.height) < 40 && abs(translation.width) > 50 { // Loosened y-axis constraint
+                        if abs(translation.height) < 40 && abs(translation.width) > 50 {
                             handleSwipe(translation, velocity: value.predictedEndTranslation)
                         }
                     }
@@ -613,7 +591,7 @@ struct KeyboardView: View {
                 textDocumentProxy.deleteBackward()
                 playHaptic(style: .medium)
             }
-            .onLongPressGesture(minimumDuration: 0.4, maximumDistance: 10, pressing: { isPressing in // Was missing
+            .onLongPressGesture(minimumDuration: 0.4, maximumDistance: 10, pressing: { isPressing in
                 if !isPressing {
                     stopDeletingContinuously()
                 }
@@ -740,13 +718,43 @@ struct KeyboardView: View {
     }
     
     private func playHaptic(style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
-        // We can attempt to play, but system sandbox may prevent it.
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.prepare()
         generator.impactOccurred()
     }
     
     // MARK: - Key Data
+    
+    // pair dict
+    
+//    private let pairDict = [
+//        // Shavian pairs
+//        "𐑐":"𐑚", "𐑑":"𐑛", "𐑒":"𐑜", "𐑓":"𐑝", "𐑔":"𐑞", "𐑕":"𐑟", "𐑖":"𐑠", "𐑗":"𐑡", "𐑘":"𐑢", "𐑙":"𐑣",
+//        "𐑤":"𐑮", "𐑯":"𐑥", "𐑦":"𐑰", "𐑲":"𐑱", "𐑨":"𐑧", "𐑩":"𐑪", "𐑳":"𐑴", "𐑵":"𐑫", "𐑬":"𐑶", "𐑭":"𐑷",
+//        "𐑸":"𐑹", "𐑺":"𐑻", "𐑼":"𐑽", "𐑿":"𐑾", "·":"⸰",
+//        
+//        // Symbols and numbers pairs
+//        "0":"°", "1":"!", "2":"@", "3":"#", "4":"$", "5":"%", "6":"^", "7":"&", "8":"*", "9":"|",
+//        "~":"☭", "=":"+", "/":"\\", "-":"_", ":":";", "{":"}", "[":"]", "(":")", "<":">", "«":"»",
+//        ".":".", ",":",", "!":"!", "?":"?", "'":"`",
+//        
+//        // qwerty
+//        "a":"A", "b":"B", "c":"C", "d":"D", "e":"E", "f":"F", "g":"G", "h":"H", "i":"I", "j":"J",
+//        "k":"K", "l":"L", "m":"M", "n":"N", "o":"O", "p":"P", "q":"Q", "r":"R", "s":"S", "t":"T",
+//        "u":"U", "v":"V", "w":"W", "x":"X", "y":"Y", "z":"Z"
+//    ]
+//    
+//    private let shavianMap = [
+//        "𐑐", "𐑑", "𐑒", "𐑓", "𐑔", "𐑕", "𐑖", "𐑗", "𐑘", "𐑙",
+//        "𐑤", "𐑯", "𐑦", "𐑲", "𐑨", "𐑩", "𐑳", "𐑵", "𐑬", "𐑭",
+//        "𐑸", "𐑺", "𐑼", "𐑿", "·"
+//    ]
+//    
+//    private let symbolsMap = [
+//        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+//        "~", "=", "/", "-", ":", "{", "[", "(", "<", "«",
+//        ".", ",", "!", "?", "'"
+//    ]
     
     private let shavian1aKeys = [
         "𐑐", "𐑑", "𐑒", "𐑓", "𐑔", "𐑕", "𐑖", "𐑗", "𐑘", "𐑙",
