@@ -32,6 +32,8 @@ SW2b:
 ⇕	.	,     ␠       ␈     !	?	`
 ```
 
+<img width="679" height="1306" alt="ss1" src="https://github.com/user-attachments/assets/08fe686d-9919-4b01-81be-b54acf750e70" />
+
 ## Development
 - [ ] MVP
   - [x] Double tap Shavian keys for their paired character (e.g. 𐑑 -> 𐑛)
@@ -83,6 +85,7 @@ SW2b:
   - [ ] Some settings options in main app window
     - [ ] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
        
+
 
 
 
