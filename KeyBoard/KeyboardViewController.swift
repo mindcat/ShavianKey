@@ -128,7 +128,7 @@ struct KeyboardView: View {
         ZStack {
             keyboardLayout
                 .padding(.horizontal, 3)
-                .padding(.vertical, 6)
+                .padding(.top, 15)
                 .background(
                     GeometryReader { geo in
                         Color.clear

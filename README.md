@@ -37,6 +37,11 @@ SW2b:
   - [x] Double tap Shavian keys for their paired character (e.g. 𐑑 -> 𐑛)
   - [x] Swipe space to the right for enter & to the left for tab
   - [x] Drag on delete to slide cursor back and forth (mixed feelings about this UX)
+  - [x] Key alignment math (bottom row)
+    - [x] Usable, but 1x keys slightly small and unaligned
+    - [x] Fix that
+    - [x] Works on form factors that aren't my iPhone 12 mini
+    - [x] Fixed that, now dealing with not enough vertical space?.. (fixed, needed to adjust padding post-refactor)
   - [x] Liquid Glass icon with icon composer
   - [ ] REFACTOR from the keymaps being held in individual arrays for each submode to SINGLE dictionary that encodes the character pair relationships
     - e.g.  for QWERTY (a -> A), Shavian (𐑐 -> 𐑚), Nums (1 -> !). This will make altering the keymap infinitely easier
@@ -47,11 +52,6 @@ SW2b:
       - [x] Refactor switcher so it works as a drag gesture when held that autoselects 'button'
             where you 'un-tap' like how diacretics and punctuation works in the native ios KB
       - [ ] SOMETIMES tapping and double tapping does not work UNTIL you use the mode picker
-  - [ ] Key alignment math (bottom row)
-    - [x] Usable, but 1x keys slightly small and unaligned
-    - [x] Fix that
-    - [x] Works on form factors that aren't my iPhone 12 mini
-    - [ ] Fixed that, now dealing with not enough vertical space?
   - [ ] QWERTY mode
     - [x] You can type in CAPS, and use backspace
     - [ ] Add spacebar
