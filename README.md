@@ -1,14 +1,15 @@
-# ShavianKey
-## A native SwiftUI based Shavian (the phonemic English alphabet) keyboard.
+# ·𐑖𐑱𐑝𐑾𐑯𐑒𐑰
+### [ENGLISH VERSION](https://github.com/mindcat/ShavianKey/blob/main/README-en.md)
+## 𐑩 𐑯𐑱𐑑𐑦𐑝 ·𐑕𐑢𐑦𐑓𐑑⸰⁠⁠𐑿𐑦 𐑚𐑱𐑕𐑑 ·𐑖𐑱𐑝𐑾𐑯 (𐑞 𐑓𐑴𐑯𐑰𐑥𐑦𐑒 ·𐑦𐑙𐑜𐑤𐑦𐑖 𐑨𐑤𐑓𐑩𐑚𐑧𐑑) 𐑒𐑰𐑚𐑹𐑛.
 
-## Usage
+## 𐑿𐑕𐑦𐑡
 
-### KEYMAP
-Tap SW (⇕) to switch between a and b submodes, or double tap it to switch between 1 and 2 modes (shavian/symbols). Press and hold to bring up all modes and submodes (this is the only way to reach SW3). [SW] should be the same size as the other keys, and is the SF symbol mount.
+### 𐑒𐑰𐑥𐑨𐑐
+𐑑𐑨𐑐 SW (⇕) 𐑑 𐑕𐑢𐑦𐑗 𐑚𐑦𐑑𐑢𐑰𐑯 a 𐑯 b 𐑕𐑳𐑚𐑥𐑴𐑛𐑟, 𐑹 𐑛𐑳𐑚𐑩𐑤 𐑑𐑨𐑐 𐑦𐑑 𐑑 𐑕𐑢𐑦𐑗 𐑚𐑦𐑑𐑢𐑰𐑯 1 𐑯 2 𐑥𐑴𐑛𐑟 (𐑖𐑱𐑝𐑾𐑯/𐑕𐑦𐑥𐑚𐑩𐑤𐑟). 𐑐𐑮𐑧𐑕 𐑯 𐑣𐑴𐑤𐑛 𐑑 𐑚𐑮𐑦𐑙 𐑳𐑐 𐑷𐑤 𐑥𐑴𐑛𐑟 𐑯 𐑕𐑳𐑚𐑥𐑴𐑛𐑟 (𐑞𐑦𐑕 𐑦𐑟 𐑞 𐑴𐑯𐑤𐑦 𐑢𐑱 𐑑 𐑮𐑰𐑗 SW3). [SW] 𐑖𐑫𐑛 𐑚𐑰 𐑞 𐑕𐑱𐑥 𐑕𐑲𐑟 𐑨𐑟 𐑞 𐑳𐑞𐑼 𐑒𐑰𐑟, 𐑯 𐑦𐑟 𐑞 SF 𐑕𐑦𐑥𐑚𐑩𐑤 «𐑥𐑬𐑯𐑑».
 
-Any button in modes 1 or 2 can be double tapped for its other submode value (e.g. when in default 1a, double tapping will result in the 1b value in the same position: 𐑐 -> 𐑚 or 𐑨 -> 𐑧, same in 2a and 2b).
+𐑧𐑯𐑦 𐑚𐑳𐑑𐑩𐑯 𐑦𐑯 𐑥𐑴𐑛𐑟 1 𐑹 2 𐑒𐑨𐑯 𐑚𐑰 𐑛𐑳𐑚𐑩𐑤 𐑑𐑨𐑐𐑑 𐑓 𐑦𐑑𐑕 𐑳𐑞𐑼 𐑕𐑳𐑚𐑥𐑴𐑛 𐑝𐑨𐑤𐑿 (𐑦𐑜𐑟 𐑢𐑧𐑯 𐑦𐑯 𐑛𐑦𐑓𐑷𐑤𐑑 1a, 𐑛𐑳𐑚𐑩𐑤 𐑑𐑨𐑐𐑦𐑙 𐑢𐑦𐑤 𐑮𐑦𐑟𐑳𐑤𐑑 𐑦𐑯 𐑞 1b 𐑝𐑨𐑤𐑿 𐑦𐑯 𐑞 𐑕𐑱𐑥 𐑐𐑩𐑟𐑦𐑖𐑩𐑯: 𐑐 -> 𐑚 𐑹 𐑨 -> 𐑧, 𐑕𐑱𐑥 𐑦𐑯 2a 𐑯 2b).
 
-[SPC - DEL] ( ␠ - ␈ ) are two separate buttons, each 2x the size of a normal button. You can press and hold on SPC to move around the cursor like the native keyboard, and press and hold on DEL to select text (starting from where the cursor currently is). [SPC - DEL]  should be in the center of the horizontal stack. Swiping right quickly on [SPC - DEL] is ENTER, while swiping left is TAB. SPC is space, DEL is delete.left.
+[SPC - DEL] ( ␠ - ␈ ) 𐑸 𐑑𐑵 𐑕𐑧𐑐𐑼𐑩𐑑 𐑚𐑳𐑑𐑩𐑯𐑟, 𐑰𐑗 2x 𐑞 𐑕𐑲𐑟 𐑝 𐑩 𐑯𐑹𐑥𐑩𐑤 𐑚𐑳𐑑𐑩𐑯. 𐑿 𐑒𐑨𐑯 𐑐𐑮𐑧𐑕 𐑯 𐑣𐑴𐑤𐑛 𐑪𐑯 SPC 𐑑 𐑥𐑵𐑝 𐑼𐑬𐑯𐑛 𐑞 𐑒𐑻𐑕𐑼 𐑤𐑲𐑒 𐑞 𐑯𐑱𐑑𐑦𐑝 𐑒𐑰𐑚𐑹𐑛, 𐑯 𐑐𐑮𐑧𐑕 𐑯 𐑣𐑴𐑤𐑛 𐑪𐑯 DEL 𐑑 𐑕𐑦𐑤𐑧𐑒𐑑 𐑑𐑧𐑒𐑕𐑑 (𐑕𐑑𐑸𐑑𐑦𐑙 𐑓𐑮𐑪𐑥 𐑢𐑺 𐑞 𐑒𐑻𐑕𐑼 𐑒𐑳𐑮𐑩𐑯𐑑𐑤𐑦 𐑦𐑟). [SPC - DEL] 𐑖𐑫𐑛 𐑚𐑰 𐑦𐑯 𐑞 𐑕𐑧𐑯𐑑𐑼 𐑝 𐑞 𐑣𐑹𐑦𐑟𐑪𐑯𐑑𐑩𐑤 𐑕𐑑𐑨𐑒. 𐑕𐑢𐑲𐑐𐑦𐑙 𐑮𐑲𐑑 𐑒𐑢𐑦𐑒𐑤𐑦 𐑪𐑯 [SPC - DEL] 𐑦𐑟 ENTER, 𐑢𐑲𐑤 𐑕𐑢𐑲𐑐𐑦𐑙 𐑤𐑧𐑓𐑑 𐑦𐑟 TAB. SPC 𐑦𐑟 «𐑕𐑐𐑱𐑕», DEL 𐑦𐑟 «𐑛𐑦𐑤𐑰𐑑.𐑤𐑧𐑓𐑑».
 
 ```
 SW1a:
@@ -34,23 +35,23 @@ SW2b:
 
 <img width="679" height="1306" alt="ss1" src="https://github.com/user-attachments/assets/08fe686d-9919-4b01-81be-b54acf750e70" />
 
-## Development
+## 𐑛𐑦𐑝𐑧𐑤𐑩𐑐𐑥𐑩𐑯𐑑
 - [ ] MVP
-  - [x] Double tap Shavian keys for their paired character (e.g. 𐑑 -> 𐑛)
-  - [x] Swipe space to the right for enter & to the left for tab
-  - [x] Drag on delete to slide cursor back and forth (mixed feelings about this UX)
-  - [x] Key alignment math (bottom row)
-    - [x] Usable, but 1x keys slightly small and unaligned
-    - [x] Fix that
-    - [x] Works on form factors that aren't my iPhone 12 mini
-    - [x] Fixed that, now dealing with not enough vertical space?.. (fixed, needed to adjust padding post-refactor)
-    - [x] I was so wrong and had to do a horrific amount of refactoring because just getting an accurate frame width at init is apparently too much
-  - [x] Liquid Glass icon with icon composer
-  - [ ] REFACTOR from the keymaps being held in individual arrays for each submode to SINGLE dictionary that encodes the character pair relationships
-    - e.g.  for QWERTY (a -> A), Shavian (𐑐 -> 𐑚), Nums (1 -> !). This will make altering the keymap infinitely easier
-  - [ ] Mode switcher
-    - [x] Tapping switches to alternate keys (submode)
-    - [x] Double tapping (<0.3s) switches between Shavian and Nums/Syms (and back to Shavian if in QWERTY)
+  - [x] 𐑛𐑳𐑚𐑩𐑤 𐑑𐑨𐑐 ·𐑖𐑱𐑝𐑾𐑯 𐑒𐑰𐑟 𐑓 𐑞𐑺 𐑐𐑺𐑛 𐑒𐑨𐑮𐑩𐑒𐑑𐑼 (𐑦𐑜𐑟 𐑑 -> 𐑛)
+  - [x] 𐑕𐑢𐑲𐑐 𐑕𐑐𐑱𐑕 𐑑 𐑞 𐑮𐑲𐑑 𐑓 𐑧𐑯𐑑𐑼 & 𐑑 𐑞 𐑤𐑧𐑓𐑑 𐑓 𐑑𐑨𐑚
+  - [x] 𐑛𐑮𐑨𐑜 𐑪𐑯 𐑛𐑦𐑤𐑰𐑑 𐑑 𐑕𐑤𐑲𐑛 𐑒𐑻𐑕𐑼 𐑚𐑨𐑒 𐑯 𐑓𐑹𐑔 (𐑥𐑦𐑒𐑕𐑑 𐑓𐑰𐑤𐑦𐑙𐑟 𐑩𐑚𐑬𐑑 𐑞𐑦𐑕 UX)
+  - [x] 𐑒𐑰 𐑩𐑤𐑲𐑯𐑥𐑩𐑯𐑑 𐑥𐑨𐑔 (𐑚𐑪𐑑𐑩𐑥 𐑮𐑴)
+    - [x] 𐑿𐑟𐑩𐑚𐑩𐑤, 𐑚𐑳𐑑 1x 𐑒𐑰𐑟 𐑕𐑤𐑲𐑑𐑤𐑦 𐑕𐑥𐑷𐑤 𐑯 𐑳𐑯𐑩𐑤𐑲𐑯𐑛
+    - [x] 𐑓𐑦𐑒𐑕 𐑞𐑨𐑑
+    - [x] 𐑢𐑻𐑒𐑕 𐑪𐑯 𐑓𐑹𐑥 𐑓𐑨𐑒𐑑𐑼𐑟 𐑞𐑨𐑑 𐑸𐑯𐑑 𐑥𐑲 ·𐑲𐑓𐑴𐑯 12 𐑥𐑦𐑯𐑦
+    - [x] 𐑓𐑦𐑒𐑕𐑑 𐑞𐑨𐑑, 𐑯𐑬 𐑛𐑰𐑤𐑦𐑙 𐑢𐑦𐑞 𐑯𐑪𐑑 𐑦𐑯𐑳𐑓 𐑝𐑻𐑑𐑦𐑒𐑩𐑤 𐑕𐑐𐑱𐑕?.. (𐑓𐑦𐑒𐑕𐑑, 𐑯𐑰𐑛𐑩𐑛 𐑑 𐑩𐑡𐑳𐑕𐑑 𐑐𐑨𐑛𐑦𐑙 𐑐𐑴𐑕𐑑-𐑮𐑰𐑓𐑨𐑒𐑑𐑼)
+    - [x] 𐑲 𐑢𐑪𐑟 𐑕𐑴 𐑮𐑪𐑙 𐑯 𐑣𐑨𐑛 𐑑 𐑛𐑵 𐑩 𐑣𐑪𐑮𐑦𐑓𐑦𐑒 𐑩𐑥𐑬𐑯𐑑 𐑝 𐑮𐑰𐑓𐑨𐑒𐑑𐑼𐑦𐑙 𐑚𐑦𐑒𐑪𐑟 𐑡𐑳𐑕𐑑 𐑜𐑧𐑑𐑦𐑙 𐑩𐑯 𐑨𐑒𐑘𐑼𐑩𐑑 𐑓𐑮𐑱𐑥 𐑢𐑦𐑛𐑔 𐑨𐑑 𐑦𐑯𐑦𐑑 𐑦𐑟 𐑩𐑐𐑨𐑮𐑩𐑯𐑑𐑤𐑦 𐑑𐑵 𐑥𐑳𐑗
+  - [x] 𐑤𐑦𐑒𐑢𐑦𐑛 𐑜𐑤𐑨𐑕 𐑲𐑒𐑪𐑯 𐑢𐑦𐑞 𐑲𐑒𐑪𐑯 𐑒𐑩𐑥𐑐𐑴𐑟𐑼
+  - [ ] 𐑮𐑰𐑓𐑨𐑒𐑑𐑼 𐑓𐑮𐑪𐑥 𐑞 𐑒𐑰𐑥𐑨𐑐𐑕 𐑚𐑰𐑦𐑙 𐑣𐑧𐑤𐑛 𐑦𐑯 𐑦𐑯𐑛𐑦𐑝𐑦𐑡𐑵𐑩𐑤 𐑼𐑱𐑟 𐑓 𐑰𐑗 𐑕𐑳𐑚𐑥𐑴𐑛 𐑑 ·𐑕𐑦𐑙𐑜𐑩𐑤 𐑛𐑦𐑒𐑖𐑩𐑯𐑺𐑦 𐑞𐑨𐑑 𐑦𐑯𐑒𐑴𐑛𐑟 𐑞 𐑒𐑨𐑮𐑩𐑒𐑑𐑼 𐑐𐑺 𐑮𐑦𐑤𐑱𐑖𐑩𐑯𐑖𐑦𐑐𐑕
+    - 𐑦𐑜𐑟 𐑓 ·𐑒𐑢𐑻𐑑𐑦 (𐑩 -> 𐑩), ·𐑖𐑱𐑝𐑾𐑯 (𐑐 -> 𐑚), ·𐑯𐑳𐑥𐑟 (1 -> !). 𐑞𐑦𐑕 𐑢𐑦𐑤 𐑥𐑱𐑒 𐑷𐑤𐑑𐑼𐑦𐑙 𐑞 𐑒𐑰𐑥𐑨𐑐 𐑦𐑯𐑓𐑦𐑯𐑦𐑑𐑤𐑦 𐑰𐑟𐑽
+  - [ ] 𐑥𐑴𐑛 𐑕𐑢𐑦𐑗𐑼
+    - [x] 𐑑𐑨𐑐𐑦𐑙 𐑕𐑢𐑦𐑗𐑩𐑟 𐑑 𐑷𐑤𐑑𐑼𐑯𐑱𐑑 𐑒𐑰𐑟 (𐑕𐑳𐑚𐑥𐑴𐑛)
+    - [x] 𐑛𐑳𐑚𐑩𐑤 𐑑𐑨𐑐𐑦𐑙 (<0.3𐑟) 𐑕𐑢𐑦𐑗𐑩𐑟 𐑚𐑦𐑑𐑢𐑰𐑯 ·𐑖𐑱𐑝𐑾𐑯 𐑯 𐑯𐑳𐑥𐑟/𐑕𐑦𐑥𐑟 (𐑯 𐑚𐑨𐑒 𐑑 ·𐑖𐑱𐑝𐑾𐑯 𐑦𐑓 𐑦𐑯 ·𐑒𐑢𐑻𐑑𐑦)
     - [x] When held brings up small mode picker for Shavian/Numbers & Symbols/QWERTY boards
       - [x] Refactor switcher so it works as a drag gesture when held that autoselects 'button'
             where you 'un-tap' like how diacretics and punctuation works in the native ios KB
@@ -89,6 +90,7 @@ SW2b:
     - [ ] Let user choose whether to have SPC-DEL or DEL-SPC      
     - [ ] Maybe let user turn off QWERTY mode? or switch it to colemak
     - [ ] 
+
 
 
 
