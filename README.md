@@ -89,7 +89,6 @@ SW2b:
     - [ ] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
     - [ ] Let user choose whether to have SPC-DEL or DEL-SPC      
     - [ ] Maybe let user turn off QWERTY mode? or switch it to colemak
-    - [ ] 
 
 
 
