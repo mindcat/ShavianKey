@@ -67,6 +67,11 @@ struct KeyboardView: View {
     let needsInputModeSwitchKey: Bool
     let switchAction: () -> Void
     
+    // key width
+    @State private var spacing: CGFloat = 4
+    @State private var keyWidth1x: CGFloat = 35
+    @State private var keyWidth2x: CGFloat = (35 * 2) + 4
+    
     @State private var currentMode: KeyboardMode = .shavian1
     @State private var showingModePicker = false
     @State private var lastTapTime: Date = Date()
@@ -124,6 +129,17 @@ struct KeyboardView: View {
             keyboardLayout
                 .padding(.horizontal, 3)
                 .padding(.vertical, 6)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .onAppear {
+                                updateKeyWidths(for: geo.size.width)
+                            }
+                            .onChange(of: geo.size.width) { _, newWidth in
+                                updateKeyWidths(for: newWidth)
+                            }
+                    }
+                )
             
             if showingModePicker {
                 Color.black.opacity(0.001)
@@ -224,7 +240,7 @@ struct KeyboardView: View {
              
              */
             // Row 1
-            HStack(spacing: 4) {
+            HStack(spacing: spacing) {
                 ForEach(0..<10, id: \.self) { i in
                     keyButton(keys[i], alternateKey: mode == .shavian1 ? shavian1bKeys[i] : shavian1aKeys[i])
                         .frame(maxWidth: .infinity)
@@ -233,7 +249,7 @@ struct KeyboardView: View {
             .frame(height: 42)
             
             // Row 2
-            HStack(spacing: 4) {
+            HStack(spacing: spacing) {
                 ForEach(10..<20, id: \.self) { i in
                     keyButton(keys[i], alternateKey: mode == .shavian1 ? shavian1bKeys[i] : shavian1aKeys[i])
                         .frame(maxWidth: .infinity)
@@ -241,36 +257,28 @@ struct KeyboardView: View {
             }
             .frame(height: 42)
             
-            // Row 3: COME BACK AND REDO THIS AND REMEMBER DRY
-            GeometryReader { geo in
-                let spacing: CGFloat = 4
-                let totalSpacing = spacing * 9
-                let keyWidth1x = floor((geo.size.width - totalSpacing) / 10)
-                let keyWidth2x = (keyWidth1x * 2) + spacing + 2 // fucked up TEMPORARY fix
+            // Row 3: THIS WAS REDONE, hopefully working
+            HStack(spacing: spacing) {
+                switchButton()
+                    .frame(width: keyWidth1x)
                 
-                HStack(spacing: spacing) {
-                    switchButton()
-                        .frame(width: keyWidth1x)
-                    
-                    keyButton(keys[20], alternateKey: mode == .shavian1 ? shavian1bKeys[20] : shavian1aKeys[20])
-                        .frame(width: keyWidth1x)
-                    keyButton(keys[21], alternateKey: mode == .shavian1 ? shavian1bKeys[21] : shavian1aKeys[21])
-                        .frame(width: keyWidth1x)
-                    
-                    deleteKeyButton()
-                        .frame(width: keyWidth2x)
-                    
-                    spaceKeyButton()
-                        .frame(width: keyWidth2x)
-                    
-                    keyButton(keys[22], alternateKey: mode == .shavian1 ? shavian1bKeys[22] : shavian1aKeys[22])
-                        .frame(width: keyWidth1x)
-                    keyButton(keys[23], alternateKey: mode == .shavian1 ? shavian1bKeys[23] : shavian1aKeys[23])
-                        .frame(width: keyWidth1x)
-                    // this key needs to become a function so more punctuation can be accessed from shavian...
-                    keyButton(keys[24], alternateKey: mode == .shavian1 ? shavian1bKeys[24] : shavian1aKeys[24])
-                        .frame(width: keyWidth1x)
-                }
+                keyButton(keys[20], alternateKey: mode == .shavian1 ? shavian1bKeys[20] : shavian1aKeys[20])
+                    .frame(width: keyWidth1x)
+                keyButton(keys[21], alternateKey: mode == .shavian1 ? shavian1bKeys[21] : shavian1aKeys[21])
+                    .frame(width: keyWidth1x)
+                
+                deleteKeyButton()
+                    .frame(width: keyWidth2x)
+                
+                spaceKeyButton()
+                    .frame(width: keyWidth2x)
+                
+                keyButton(keys[22], alternateKey: mode == .shavian1 ? shavian1bKeys[22] : shavian1aKeys[22])
+                    .frame(width: keyWidth1x)
+                keyButton(keys[23], alternateKey: mode == .shavian1 ? shavian1bKeys[23] : shavian1aKeys[23])
+                    .frame(width: keyWidth1x)
+                keyButton(keys[24], alternateKey: mode == .shavian1 ? shavian1bKeys[24] : shavian1aKeys[24])
+                    .frame(width: keyWidth1x)
             }
             .frame(height: 42)
         }
@@ -316,36 +324,28 @@ struct KeyboardView: View {
             }
             .frame(height: 42)
             
-            // Row 3: COME BACK AND REDO THIS AND REMEMBER DRY
-            GeometryReader { geo in
-                // 8 items = 7 gaps. 10 key units total (1,1,1,2,2,1,1,1)... but the 1x keys are a little too skinny on this row
-                let spacing: CGFloat = 4
-                let totalSpacing = spacing * 9
-                let keyWidth1x = floor((geo.size.width - totalSpacing) / 10)
-                let keyWidth2x = (keyWidth1x * 2) + spacing + 2
+            // Row 3: REFACTORED
+            HStack(spacing: 4) {
+                switchButton()
+                    .frame(width: keyWidth1x)
                 
-                HStack(spacing: spacing) {
-                    switchButton()
-                        .frame(width: keyWidth1x)
-                    
-                    keyButton(keys[20], alternateKey: mode == .symbols1 ? symbols2bKeys[20] : symbols2aKeys[20])
-                        .frame(width: keyWidth1x)
-                    keyButton(keys[21], alternateKey: mode == .symbols1 ? symbols2bKeys[21] : symbols2aKeys[21])
-                        .frame(width: keyWidth1x)
-                    
-                    deleteKeyButton()
-                        .frame(width: keyWidth2x)
-                    
-                    spaceKeyButton()
-                        .frame(width: keyWidth2x)
-                    
-                    keyButton(keys[22], alternateKey: mode == .symbols1 ? symbols2bKeys[22] : symbols2aKeys[22])
-                        .frame(width: keyWidth1x)
-                    keyButton(keys[23], alternateKey: mode == .symbols1 ? symbols2bKeys[23] : symbols2aKeys[23])
-                        .frame(width: keyWidth1x)
-                    keyButton(keys[24], alternateKey: mode == .symbols1 ? symbols2bKeys[24] : symbols2aKeys[24])
-                        .frame(width: keyWidth1x)
-                }
+                keyButton(keys[20], alternateKey: mode == .symbols1 ? symbols2bKeys[20] : symbols2aKeys[20])
+                    .frame(width: keyWidth1x)
+                keyButton(keys[21], alternateKey: mode == .symbols1 ? symbols2bKeys[21] : symbols2aKeys[21])
+                    .frame(width: keyWidth1x)
+                
+                deleteKeyButton()
+                    .frame(width: keyWidth2x)
+                
+                spaceKeyButton()
+                    .frame(width: keyWidth2x)
+                
+                keyButton(keys[22], alternateKey: mode == .symbols1 ? symbols2bKeys[22] : symbols2aKeys[22])
+                    .frame(width: keyWidth1x)
+                keyButton(keys[23], alternateKey: mode == .symbols1 ? symbols2bKeys[23] : symbols2aKeys[23])
+                    .frame(width: keyWidth1x)
+                keyButton(keys[24], alternateKey: mode == .symbols1 ? symbols2bKeys[24] : symbols2aKeys[24])
+                    .frame(width: keyWidth1x)
             }
             .frame(height: 42)
         }
@@ -408,6 +408,19 @@ struct KeyboardView: View {
     }
     
     // MARK: - Key Buttons
+    
+    private func updateKeyWidths(for width: CGFloat) {
+        guard width > 0 else { return }
+        
+        let widthFrame = width // 375 for 12mini, 402 for 17... ANNOYING
+        let cellNumber = 10
+        let spacers = spacing * CGFloat((cellNumber + 1))
+        let keyTotalWidth = widthFrame - spacers
+        
+        let cellWidth: CGFloat = keyTotalWidth / CGFloat(cellNumber)
+        self.keyWidth1x = cellWidth
+        self.keyWidth2x = (cellWidth * 2) + spacing
+    }
     
     private func keyButton(_ key: String, alternateKey: String?) -> some View {
         Button(action: {

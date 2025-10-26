@@ -49,8 +49,9 @@ SW2b:
       - [ ] SOMETIMES tapping and double tapping does not work UNTIL you use the mode picker
   - [ ] Key alignment math (bottom row)
     - [x] Usable, but 1x keys slightly small and unaligned
-    - [ ] Fix that
-    - [ ] Works on form factors that aren't my iPhone 12 mini
+    - [x] Fix that
+    - [x] Works on form factors that aren't my iPhone 12 mini
+    - [ ] Fixed that, now dealing with not enough vertical space?
   - [ ] QWERTY mode
     - [x] You can type in CAPS, and use backspace
     - [ ] Add spacebar
