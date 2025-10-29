@@ -50,11 +50,21 @@
 			);
 			target = D48B5D3E2EA8DA060096B75D /* KeyBoard */;
 		};
+		D497D0562EB1887A00B16CFD /* Exceptions for "ShavianKey" folder in "KeyBoard" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = D48B5D3E2EA8DA060096B75D /* KeyBoard */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D48B5D2F2EA8D9B20096B75D /* ShavianKey */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D497D0562EB1887A00B16CFD /* Exceptions for "ShavianKey" folder in "KeyBoard" target */,
+			);
 			path = ShavianKey;
 			sourceTree = "<group>";
 		};
@@ -363,6 +373,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = ShavianKey;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ShavianKey/ShavianKey.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2877RH94M9;
@@ -395,6 +406,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = ShavianKey;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ShavianKey/ShavianKey.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2877RH94M9;
@@ -425,6 +437,7 @@
 		D48B5D492EA8DA060096B75D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = KeyBoard/KeyBoard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2877RH94M9;
@@ -453,6 +466,7 @@
 		D48B5D4A2EA8DA060096B75D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = KeyBoard/KeyBoard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2877RH94M9;

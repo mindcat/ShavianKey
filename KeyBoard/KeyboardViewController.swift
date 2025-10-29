@@ -67,9 +67,20 @@ struct KeyboardView: View {
     let needsInputModeSwitchKey: Bool
     let switchAction: () -> Void
     
+    // appstorage stuff (have to hardcode because apparently base views make init a nightmare
+//    private let appGroupID = "group.com.koteczek.ShavianKey"
+//    private let sharedDefaults = UserDefaults(suiteName: "group.com.koteczek.ShavianKey")!
+    
+    // BIG UI DECISIONS CONTROLLED WITH SHARED SETTINGS
+    // predictions & autocorrect
+    @AppStorage("proofing", store: UserDefaults(suiteName: "group.com.koteczek.ShavianKey")!) var proofing: Bool = true
+    // transliterate
+    @AppStorage("transliteration", store: UserDefaults(suiteName: "group.com.koteczek.ShavianKey")!) var transliteration: Bool = true
+    @AppStorage("left_delete", store: UserDefaults(suiteName: "group.com.koteczek.ShavianKey")!) var left_delete: Bool = true
+    
     // key width
     @State private var hz_padding: CGFloat = 6
-    @State private var top_padding: CGFloat = 6
+    @State private var top_padding: CGFloat = 0
     @State private var spacing: CGFloat = 4
     @State private var keyWidth1x: CGFloat = 10
     @State private var keyWidth2x: CGFloat = 10
@@ -81,6 +92,21 @@ struct KeyboardView: View {
     @State private var longPressLocation: CGPoint = .zero
     @State private var isDeleting = false
     @State private var deleteTimer: Timer?
+    
+    // Prediction State
+    @State private var currentWord: String = ""
+    @State private var predictions: [String] = []
+    @State private var predictionFlags: [Bool] = [false, false]
+    @State private var dictButtonState: DictButtonState = .plus
+    
+    
+
+    enum DictButtonState {
+        case plus         // Word not in dict
+        case checked      // Word in dict
+        case pendingDelete  // user tapped checked, show 'x' as confirmation
+    }
+    
     
     // switch activate on tapoff
     @State private var switchButtonFrame: CGRect = .zero
@@ -222,14 +248,20 @@ struct KeyboardView: View {
     // MARK: - Shavian Layout
     
     private func shavianLayout(mode: KeyboardMode) -> some View {
-        let keys = mode == .shavian1 ? shavian1aKeys : shavian1bKeys
+        let keys: [String]
+        if mode == .shavian1 {
+            keys = shavianMap
+        } else { // .shavian2
+            // Create the alternate key set by mapping over the base map
+            keys = shavianMap.map { pairDict[from: $0] ?? $0 }
+        }
         
         return VStack(spacing: 6) {
             
             // Prediction and autocorrect
             // I'm leaning towards keeping all UI in the view controller? so the logic for display...
             
-            
+            predictionBar
             
             /*
              SW1a:
@@ -246,7 +278,7 @@ struct KeyboardView: View {
             // Row 1
             HStack(spacing: spacing) {
                 ForEach(0..<10, id: \.self) { i in
-                    keyButton(keys[i], alternateKey: mode == .shavian1 ? shavian1bKeys[i] : shavian1aKeys[i])
+                    keyButton(keys[i], alternateKey: mode == .shavian1 ? pairDict[from: keys[i]] : pairDict[to: keys[i]])
                         .frame(width: keyWidth1x)
                 }
             }
@@ -255,7 +287,7 @@ struct KeyboardView: View {
             // Row 2
             HStack(spacing: spacing) {
                 ForEach(10..<20, id: \.self) { i in
-                    keyButton(keys[i], alternateKey: mode == .shavian1 ? shavian1bKeys[i] : shavian1aKeys[i])
+                    keyButton(keys[i], alternateKey: mode == .shavian1 ? pairDict[from: keys[i]] : pairDict[to: keys[i]])
                         .frame(width: keyWidth1x)
                 }
             }
@@ -266,22 +298,28 @@ struct KeyboardView: View {
                 switchButton()
                     .frame(width: keyWidth1x)
                 
-                keyButton(keys[20], alternateKey: mode == .shavian1 ? shavian1bKeys[20] : shavian1aKeys[20])
+                keyButton(keys[20], alternateKey: mode == .shavian1 ? pairDict[from: keys[20]] : pairDict[to: keys[20]])
                     .frame(width: keyWidth1x)
-                keyButton(keys[21], alternateKey: mode == .shavian1 ? shavian1bKeys[21] : shavian1aKeys[21])
+                keyButton(keys[21], alternateKey: mode == .shavian1 ? pairDict[from: keys[21]] : pairDict[to: keys[21]])
                     .frame(width: keyWidth1x)
                 
-                deleteKeyButton()
-                    .frame(width: keyWidth2x)
+                if left_delete {
+                    deleteKeyButton()
+                        .frame(width: keyWidth2x)
+                    spaceKeyButton()
+                        .frame(width: keyWidth2x)
+                } else {
+                    spaceKeyButton()
+                        .frame(width: keyWidth2x)
+                    deleteKeyButton()
+                        .frame(width: keyWidth2x)
+                }
                 
-                spaceKeyButton()
-                    .frame(width: keyWidth2x)
-                
-                keyButton(keys[22], alternateKey: mode == .shavian1 ? shavian1bKeys[22] : shavian1aKeys[22])
+                keyButton(keys[22], alternateKey: mode == .shavian1 ? pairDict[from: keys[22]] : pairDict[to: keys[22]])
                     .frame(width: keyWidth1x)
-                keyButton(keys[23], alternateKey: mode == .shavian1 ? shavian1bKeys[23] : shavian1aKeys[23])
+                keyButton(keys[23], alternateKey: mode == .shavian1 ? pairDict[from: keys[23]] : pairDict[to: keys[23]])
                     .frame(width: keyWidth1x)
-                keyButton(keys[24], alternateKey: mode == .shavian1 ? shavian1bKeys[24] : shavian1aKeys[24])
+                keyButton(keys[24], alternateKey: mode == .shavian1 ? pairDict[from: keys[24]] : pairDict[to: keys[24]])
                     .frame(width: keyWidth1x)
             }
             .frame(height: 42)
@@ -291,9 +329,16 @@ struct KeyboardView: View {
     // MARK: - Symbols Layout
     
     private func symbolsLayout(mode: KeyboardMode) -> some View {
-        let keys = mode == .symbols1 ? symbols2aKeys : symbols2bKeys
+        let keys: [String]
+        if mode == .symbols1 {
+            keys = symbolsMap
+        } else { // .symbols2
+            keys = symbolsMap.map { pairDict[from: $0] ?? $0 }
+        }
         
         return VStack(spacing: 6) {
+            
+            predictionBar
             
             
             /*
@@ -309,11 +354,10 @@ struct KeyboardView: View {
              􀣊    .    ,       􁁺       􀆛        !    ?    `
 
              */
-            
             // Row 1
             HStack(spacing: 4) {
                 ForEach(0..<10, id: \.self) { i in
-                    keyButton(keys[i], alternateKey: mode == .symbols1 ? symbols2bKeys[i] : symbols2aKeys[i])
+                    keyButton(keys[i], alternateKey: mode == .symbols1 ? pairDict[from: keys[i]] : pairDict[to: keys[i]])
                         .frame(width: keyWidth1x)
                 }
             }
@@ -322,7 +366,8 @@ struct KeyboardView: View {
             // Row 2
             HStack(spacing: 4) {
                 ForEach(10..<20, id: \.self) { i in
-                    keyButton(keys[i], alternateKey: mode == .symbols1 ? symbols2bKeys[i] : symbols2aKeys[i])
+                    // FIX 2: Correct alternateKey logic
+                    keyButton(keys[i], alternateKey: mode == .symbols1 ? pairDict[from: keys[i]] : pairDict[to: keys[i]])
                         .frame(width: keyWidth1x)
                 }
             }
@@ -333,22 +378,28 @@ struct KeyboardView: View {
                 switchButton()
                     .frame(width: keyWidth1x)
                 
-                keyButton(keys[20], alternateKey: mode == .symbols1 ? symbols2bKeys[20] : symbols2aKeys[20])
+                keyButton(keys[20], alternateKey: mode == .symbols1 ? pairDict[from: keys[20]] : pairDict[to: keys[20]])
                     .frame(width: keyWidth1x)
-                keyButton(keys[21], alternateKey: mode == .symbols1 ? symbols2bKeys[21] : symbols2aKeys[21])
+                keyButton(keys[21], alternateKey: mode == .symbols1 ? pairDict[from: keys[21]] : pairDict[to: keys[21]])
                     .frame(width: keyWidth1x)
                 
-                deleteKeyButton()
-                    .frame(width: keyWidth2x)
+                if left_delete {
+                    deleteKeyButton()
+                        .frame(width: keyWidth2x)
+                    spaceKeyButton()
+                        .frame(width: keyWidth2x)
+                } else {
+                    spaceKeyButton()
+                        .frame(width: keyWidth2x)
+                    deleteKeyButton()
+                        .frame(width: keyWidth2x)
+                }
                 
-                spaceKeyButton()
-                    .frame(width: keyWidth2x)
-                
-                keyButton(keys[22], alternateKey: mode == .symbols1 ? symbols2bKeys[22] : symbols2aKeys[22])
+                keyButton(keys[22], alternateKey: mode == .symbols1 ? pairDict[from: keys[22]] : pairDict[to: keys[22]])
                     .frame(width: keyWidth1x)
-                keyButton(keys[23], alternateKey: mode == .symbols1 ? symbols2bKeys[23] : symbols2aKeys[23])
+                keyButton(keys[23], alternateKey: mode == .symbols1 ? pairDict[from: keys[23]] : pairDict[to: keys[23]])
                     .frame(width: keyWidth1x)
-                keyButton(keys[24], alternateKey: mode == .symbols1 ? symbols2bKeys[24] : symbols2aKeys[24])
+                keyButton(keys[24], alternateKey: mode == .symbols1 ? pairDict[from: keys[24]] : pairDict[to: keys[24]])
                     .frame(width: keyWidth1x)
             }
             .frame(height: 42)
@@ -364,8 +415,8 @@ struct KeyboardView: View {
         VStack(spacing: 6) {
             // Row 1
             HStack(spacing: spacing) {
-                ForEach(["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], id: \.self) { key in
-                    keyButton(key, alternateKey: nil)
+                ForEach(["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], id: \.self) { key in
+                    keyButton(key, alternateKey: pairDict[to: key])
                         .frame(width: keyWidth1x)
                 }
             }
@@ -375,8 +426,8 @@ struct KeyboardView: View {
             HStack(spacing: spacing) {
                 switchButton()
                     .frame(width: keyWidth1x)
-                ForEach(["A", "S", "D", "F", "G", "H", "J", "K", "L"], id: \.self) { key in
-                    keyButton(key, alternateKey: nil)
+                ForEach(["a", "s", "d", "f", "g", "h", "j", "k", "l"], id: \.self) { key in
+                    keyButton(key, alternateKey: pairDict[to: key])
                         .frame(width: keyWidth1x)
                 }
             }
@@ -386,8 +437,8 @@ struct KeyboardView: View {
             HStack(spacing: spacing) {
                 shiftButton()
                     .frame(width: keyWidth1x) // Use @State var
-                ForEach(["Z", "X", "C", "V", "B", "N", "M"], id: \.self) { key in
-                    keyButton(key, alternateKey: nil)
+                ForEach(["z", "x", "c", "v", "b", "n", "m"], id: \.self) { key in
+                    keyButton(key, alternateKey: pairDict[to: key])
                         .frame(width: keyWidth1x) // Use @State var
                 }
                 deleteButton()
@@ -396,6 +447,79 @@ struct KeyboardView: View {
             .frame(height: 42)
         }
     }
+    
+    // MARK: - Prediction Bar
+        
+        @ViewBuilder
+        private var predictionBar: some View {
+            if proofing {
+                HStack(spacing: 0) {
+                    // Left suggestion (word3)
+                    predictionButton(for: 2)
+                    
+                    verticalDivider
+                    
+                    // Center suggestion (word1 - autocorrect)
+                    predictionButton(for: 0, highlighted: predictionFlags.first ?? false)
+                    
+                    verticalDivider
+                    
+                    // Right suggestion (word2)
+                    predictionButton(for: 1)
+                    
+                    verticalDivider
+                    
+                    // Dictionary status button
+                    dictionaryButton.frame(minWidth: 42)
+                }
+                .frame(height: 38)
+                .padding(.horizontal, 4)
+                .background(.clear)
+            }
+        }
+        
+        @ViewBuilder
+        private func predictionButton(for index: Int, highlighted: Bool = false) -> some View {
+            let text = (predictions.count > index) ? predictions[index] : ""
+            
+            Button(action: {
+                guard !text.isEmpty else { return }
+                replaceCurrentWord(with: text + " ")
+            }) {
+                Text(text)
+                    .font(.system(size: 16))
+                    .foregroundColor(highlighted ? (colorScheme == .dark ? .black : .white) : (colorScheme == .dark ? .white : .black))
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .fill(highlighted ? .blue : .clear)
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(text.isEmpty)
+        }
+        
+        @ViewBuilder
+        private var dictionaryButton: some View {
+            let wordExists = predictionFlags.count > 1 ? predictionFlags[1] : false
+            
+            Button(action: {
+                handleDictButtonTap(wordExists: wordExists)
+            }) {
+                Image(dictButtonImageName(wordExists: wordExists))
+                    .frame(maxHeight: .infinity)
+            }
+            .buttonStyle(.plain)
+            // Disable if no word is typed
+            .disabled(currentWord.isEmpty)
+        }
+        
+        private var verticalDivider: some View {
+            Divider()
+                .frame(width: 1, height: 20)
+                .background(colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.2))
+        }
     
     // MARK: - Key Buttons
     
@@ -414,7 +538,7 @@ struct KeyboardView: View {
     
     private func keyButton(_ key: String, alternateKey: String?) -> some View {
         Button(action: {
-            handleKeyTap(key, alternateKey: alternateKey)
+            handleKeyTap(key, altKey: alternateKey)
         }) {
             Text(key)
                 .font(key.count == 1 && key.first?.isLetter == true ? .custom("InterAlia-Regular", size: 22) : .system(size: 20)) // not positive interalia is actually being used honestly
@@ -504,11 +628,13 @@ struct KeyboardView: View {
             .background(keyButtonStyle)
             .onTapGesture {
                 textDocumentProxy.deleteBackward()
+                updatePredictions()
                 playHaptic(style: .medium)
             }
             .onLongPressGesture(minimumDuration: 0.4, maximumDistance: 10, pressing: { isPressing in
                 if !isPressing {
                     stopDeletingContinuously()
+                    updatePredictions()
                 }
             }, perform: {
                 startDeletingContinuously()
@@ -553,8 +679,16 @@ struct KeyboardView: View {
             .frame(height: 42)
             .background(keyButtonStyle)
             .onTapGesture {
-                insertText(" ")
+                let autocorrectActive = proofing && (predictionFlags.first ?? false) && !predictions.isEmpty
+                
+                if autocorrectActive {
+                    replaceCurrentWord(with: predictions[0] + " ")
+                } else {
+                    insertText(" ")
+                }
+                
                 playHaptic(style: .light)
+                updatePredictions()
             }
             .gesture(
                 DragGesture(minimumDistance: 30)
@@ -616,20 +750,118 @@ struct KeyboardView: View {
     
     // MARK: - Actions
     
-    private func handleKeyTap(_ key: String, alternateKey: String?) {
+    private func proof(word: String) -> ([String], [Bool]) {
+        // --- THIS IS A PLACEHOLDER ---
+        if word == "𐑐" {
+            return (["𐑐𐑰𐑐𐑩𐑤", "𐑐𐑸𐑑", "𐑐𐑱"], [true, false])
+        }
+        if word == "𐑖" {
+            return (["𐑖𐑱", "𐑖𐑷", "𐑖𐑰"], [false, true])
+        }
+        
+        return (["", "", "«\(getCurrentWord())»"], [false, false])
+    }
+    
+    private func add_word(word: String) {
+        print("Adding to dict: \(word)")
+    }
+    
+    private func del_word(word: String) {
+        print("Deleting from dict: \(word)")
+    }
+    
+    private func getCurrentWord() -> String {
+        guard let context = textDocumentProxy.documentContextBeforeInput else { return "" }
+        
+        if let lastWord = context.split(whereSeparator: { $0.isWhitespace || $0.isNewline }).last {
+            return String(lastWord)
+        }
+        return ""
+    }
+    
+    private func updatePredictions() {
+        guard proofing else { return }
+        let word = getCurrentWord()
+        
+        if word == currentWord { return } // No change
+        
+        self.currentWord = word
+        
+        if word.isEmpty {
+            self.predictions = ["", "", ""]
+            self.predictionFlags = [false, false]
+            self.dictButtonState = .plus
+            return
+        }
+
+        let (preds, flags) = proof(word: word)
+        
+        var displayPreds = preds
+        while displayPreds.count < 3 {
+            displayPreds.append("")
+        }
+        
+        self.predictions = displayPreds
+        self.predictionFlags = flags
+        
+        // dict button state based on proof() result
+        let wordExists = flags.count > 1 ? flags[1] : false
+        self.dictButtonState = wordExists ? .checked : .plus
+    }
+    
+    private func replaceCurrentWord(with replacement: String) {
+        let wordToReplace = getCurrentWord()
+        for _ in 0..<wordToReplace.count {
+            textDocumentProxy.deleteBackward()
+        }
+        insertText(replacement)
+        updatePredictions()
+    }
+    
+    private func handleDictButtonTap(wordExists: Bool) {
+        switch dictButtonState {
+        case .plus:
+            // didn't exist, adding it
+            add_word(word: currentWord)
+            dictButtonState = .checked
+            playHaptic(style: .medium)
+        case .checked:
+            // exists, user is flagging for deletion
+            dictButtonState = .pendingDelete
+            playHaptic(style: .light)
+        case .pendingDelete:
+            // confirmed deletion
+            del_word(word: currentWord)
+            dictButtonState = .plus
+            playHaptic(style: .medium)
+        }
+    }
+    
+    private func dictButtonImageName(wordExists: Bool) -> String {
+        switch dictButtonState {
+        case .plus:
+            return colorScheme == .dark ? "dict.plus.dark" : "dict.plus"
+        case .checked:
+            return colorScheme == .dark ? "dict.check.dark" : "dict.check"
+        case .pendingDelete:
+            return colorScheme == .dark ? "dict.x.dark" : "dict.x"
+        }
+    }
+    
+    private func handleKeyTap(_ key: String, altKey: String?) {
         let now = Date()
         let timeSinceLastTap = now.timeIntervalSince(lastTapTime)
         
-        if timeSinceLastTap < 0.3 && lastTapButton == key && alternateKey != nil {
+        if timeSinceLastTap < 0.3 && lastTapButton == key && altKey != nil {
             // double tap for character pair
             textDocumentProxy.deleteBackward()
-            insertText(alternateKey!)
+            insertText(altKey!)
             playHaptic(style: .light)
         } else {
             insertText(key)
             playHaptic(style: .light)
         }
-        
+        updatePredictions()
         lastTapTime = now
         lastTapButton = key
     }
@@ -652,7 +884,7 @@ struct KeyboardView: View {
                 }
             }
         } else {
-            // Single tap - switch between a and b submodes
+            // switch between a and b submodes
             withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 switch currentMode {
                 case .shavian1:
@@ -691,7 +923,6 @@ struct KeyboardView: View {
         guard !isDeleting else { return }
         isDeleting = true
         
-        // Initial delete
         textDocumentProxy.deleteBackward()
         playHaptic(style: .light)
         
@@ -699,6 +930,7 @@ struct KeyboardView: View {
         deleteTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             if self.isDeleting {
                 self.textDocumentProxy.deleteBackward()
+                self.updatePredictions()
                 self.playHaptic(style: .light)
             } else {
                 self.deleteTimer?.invalidate()
@@ -727,57 +959,94 @@ struct KeyboardView: View {
     
     // pair dict
     
-//    private let pairDict = [
-//        // Shavian pairs
-//        "𐑐":"𐑚", "𐑑":"𐑛", "𐑒":"𐑜", "𐑓":"𐑝", "𐑔":"𐑞", "𐑕":"𐑟", "𐑖":"𐑠", "𐑗":"𐑡", "𐑘":"𐑢", "𐑙":"𐑣",
-//        "𐑤":"𐑮", "𐑯":"𐑥", "𐑦":"𐑰", "𐑲":"𐑱", "𐑨":"𐑧", "𐑩":"𐑪", "𐑳":"𐑴", "𐑵":"𐑫", "𐑬":"𐑶", "𐑭":"𐑷",
-//        "𐑸":"𐑹", "𐑺":"𐑻", "𐑼":"𐑽", "𐑿":"𐑾", "·":"⸰",
-//        
-//        // Symbols and numbers pairs
-//        "0":"°", "1":"!", "2":"@", "3":"#", "4":"$", "5":"%", "6":"^", "7":"&", "8":"*", "9":"|",
-//        "~":"☭", "=":"+", "/":"\\", "-":"_", ":":";", "{":"}", "[":"]", "(":")", "<":">", "«":"»",
-//        ".":".", ",":",", "!":"!", "?":"?", "'":"`",
-//        
-//        // qwerty
-//        "a":"A", "b":"B", "c":"C", "d":"D", "e":"E", "f":"F", "g":"G", "h":"H", "i":"I", "j":"J",
-//        "k":"K", "l":"L", "m":"M", "n":"N", "o":"O", "p":"P", "q":"Q", "r":"R", "s":"S", "t":"T",
-//        "u":"U", "v":"V", "w":"W", "x":"X", "y":"Y", "z":"Z"
-//    ]
-//    
-//    private let shavianMap = [
-//        "𐑐", "𐑑", "𐑒", "𐑓", "𐑔", "𐑕", "𐑖", "𐑗", "𐑘", "𐑙",
-//        "𐑤", "𐑯", "𐑦", "𐑲", "𐑨", "𐑩", "𐑳", "𐑵", "𐑬", "𐑭",
-//        "𐑸", "𐑺", "𐑼", "𐑿", "·"
-//    ]
-//    
-//    private let symbolsMap = [
-//        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-//        "~", "=", "/", "-", ":", "{", "[", "(", "<", "«",
-//        ".", ",", "!", "?", "'"
-//    ]
+    private let pairDict: BidiMap<String, String> = BidiMap( [
+        // shavian pairs
+        "𐑐":"𐑚", "𐑑":"𐑛", "𐑒":"𐑜", "𐑓":"𐑝", "𐑔":"𐑞", "𐑕":"𐑟", "𐑖":"𐑠", "𐑗":"𐑡", "𐑘":"𐑢", "𐑙":"𐑣",
+        "𐑤":"𐑮", "𐑯":"𐑥", "𐑦":"𐑰", "𐑲":"𐑱", "𐑨":"𐑧", "𐑩":"𐑪", "𐑳":"𐑴", "𐑵":"𐑫", "𐑬":"𐑶", "𐑭":"𐑷",
+        "𐑸":"𐑹", "𐑺":"𐑻", "𐑼":"𐑽", "𐑿":"𐑾", "·":"⸰",
+        
+        // symbols and numbers pairs
+        "0":"°", "1":"!", "2":"@", "3":"#", "4":"$", "5":"%", "6":"^", "7":"&", "8":"*", "9":"|",
+        "~":"☭", "=":"+", "/":"\\", "-":"_", ":":";", "{":"}", "[":"]", "(":")", "<":">", "«":"»",
+        "'":"`",
+        
+        // qwerty
+        "a":"A", "b":"B", "c":"C", "d":"D", "e":"E", "f":"F", "g":"G", "h":"H", "i":"I", "j":"J",
+        "k":"K", "l":"L", "m":"M", "n":"N", "o":"O", "p":"P", "q":"Q", "r":"R", "s":"S", "t":"T",
+        "u":"U", "v":"V", "w":"W", "x":"X", "y":"Y", "z":"Z"
+    ] )!
     
-    private let shavian1aKeys = [
+    private let shavianMap = [
         "𐑐", "𐑑", "𐑒", "𐑓", "𐑔", "𐑕", "𐑖", "𐑗", "𐑘", "𐑙",
         "𐑤", "𐑯", "𐑦", "𐑲", "𐑨", "𐑩", "𐑳", "𐑵", "𐑬", "𐑭",
         "𐑸", "𐑺", "𐑼", "𐑿", "·"
     ]
     
-    private let shavian1bKeys = [
-        "𐑚", "𐑛", "𐑜", "𐑝", "𐑞", "𐑟", "𐑠", "𐑡", "𐑢", "𐑣",
-        "𐑮", "𐑥", "𐑰", "𐑱", "𐑧", "𐑪", "𐑴", "𐑫", "𐑶", "𐑷",
-        "𐑹", "𐑻", "𐑽", "𐑾", "⸰"
-    ]
-    
-    private let symbols2aKeys = [
+    private let symbolsMap: [String] = [
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
         "~", "=", "/", "-", ":", "{", "[", "(", "<", "«",
         ".", ",", "!", "?", "'"
     ]
     
-    private let symbols2bKeys = [
-        "°", "!", "@", "#", "$", "%", "^", "&", "*", "|",
-        "☭", "+", "\\", "_", ";", "}", "]", ")", ">", "»",
-        ".", ",", "!", "?", "`"
+    private let qwertyMap: [String] = [
+        "q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
+        "a", "s", "d", "f", "g", "h", "j", "k", "l",
+        "z", "x", "c", "v", "b", "n", "m"
     ]
 }
+
+
+//struct BidiMap<F:Hashable,T:Hashable>
+//{
+//   private var _forward  : [F:T]? = nil
+//   private var _backward : [T:F]? = nil
+//
+//   var forward:[F:T]
+//   {
+//      mutating get
+//      {
+//        _forward = _forward ?? [F:T](uniqueKeysWithValues:_backward?.map{($1,$0)} ?? [] )
+//        return _forward!
+//      }
+//      set { _forward = newValue; _backward = nil }
+//   }
+//
+//   var backward:[T:F]
+//   {
+//      mutating get
+//      {
+//        _backward = _backward ?? [T:F](uniqueKeysWithValues:_forward?.map{($1,$0)} ?? [] )
+//        return _backward!
+//      }
+//      set { _backward = newValue; _forward = nil }
+//   }
+//
+//   init(_ dict:[F:T] = [:])
+//   { forward = dict  }
+//
+//   init(_ values:[(F,T)])
+//   { forward = [F:T](uniqueKeysWithValues:values) }
+//
+//   subscript(_ key:T) -> F?
+//   { mutating get { return backward[key] } set{ backward[key] = newValue } }
+//
+//   subscript(_ key:F) -> T?
+//   { mutating get { return forward[key]  } set{ forward[key]  = newValue } }
+//
+//   subscript(to key:T) -> F?
+//   { mutating get { return backward[key] } set{ backward[key] = newValue } }
+//
+//   subscript(from key:F) -> T?
+//   { mutating get { return forward[key]  } set{ forward[key]  = newValue } }
+//
+//   var count:Int { return _forward?.count ?? _backward?.count ?? 0 }
+//}
+
+
+
+
+
+
+// PROOFING
+
 

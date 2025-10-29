@@ -46,25 +46,32 @@ SW2b:
     - [x] Fixed that, now dealing with not enough vertical space?.. (fixed, needed to adjust padding post-refactor)
     - [x] I was so wrong and had to do a horrific amount of refactoring because just getting an accurate frame width at init is apparently too much
   - [x] Liquid Glass icon with icon composer
-  - [ ] REFACTOR from the keymaps being held in individual arrays for each submode to SINGLE dictionary that encodes the character pair relationships
+  - [x] REFACTOR from the keymaps being held in individual arrays for each submode to SINGLE dictionary that encodes the character pair relationships
     - e.g.  for QWERTY (a -> A), Shavian (𐑐 -> 𐑚), Nums (1 -> !). This will make altering the keymap infinitely easier
-  - [ ] Mode switcher
+  - [x] Mode switcher
     - [x] Tapping switches to alternate keys (submode)
     - [x] Double tapping (<0.3s) switches between Shavian and Nums/Syms (and back to Shavian if in QWERTY)
     - [x] When held brings up small mode picker for Shavian/Numbers & Symbols/QWERTY boards
       - [x] Refactor switcher so it works as a drag gesture when held that autoselects 'button'
             where you 'un-tap' like how diacretics and punctuation works in the native ios KB
       - [x] SOMETIMES (always at start-up, not ideal) tapping and double tapping does not work UNTIL you use the mode picker
-    - [ ] The mode switcher placement needs to behave smartly across different displays (optimized for 12 mini)
+    - [x] The mode switcher placement needs to behave smartly across different displays (optimized for 12 mini)
+  - [ ] App UX UI
+    - [x] settings toggles with state change for altering keyboard behavior?
+       - [x] switch backspace and space
+       - [x] translit toggle
+       - [x] proofing toggle
+    - [x] text playground
+    - [x] shavian localization (press a button to flip between shavian and english settings page)
   - [ ] QWERTY mode
     - [x] You can type in CAPS, and use backspace
     - [ ] Add spacebar
     - [ ] Make it so shift works (use pair dictionary, maybe?)
   - [ ] '·' key, when held, should bring up some basic punctuation options (, . ! ? « »)?
 - [ ] Intelligence
-  - [ ] UI
+  - [x] UI
     - [x] Design UI icons for displaying that the currently typed word is within the dictionary (dict.check), not in the dictionary (so, addable: dict.plus), or ready to be deleted (dict.x)
-    - [ ] Make row as close to native ios autocorrect as possible (3 part bar with small button on the right)
+    - [x] Make row as close to native ios autocorrect as possible (3 part bar with small button on the right)
     - [ ] Intelligently put corrections vs predictions in the 3 options, highlight either prediction or correction based if likelihood crosses a threshold WHILE the current word is NOT in the dictionary
   - [ ] Autocorrect
     - [ ] Native swift simple edit steps (deletion, transposition, replacement, insertion) based error checking
@@ -84,11 +91,12 @@ SW2b:
 - [ ] Extras
   - [ ] Use the top 'predictions' row in QWERTY for in-keyboard English -> Shavian transliteration
     - [ ] Dechifro or Ormin's transliterator?? Which is most easily rewritten in Swift and has a minimum of dependencies?
+    - [x] UI for this
+      - [x] translate icon
+      - [ ] pretty and usable selection method
+      - [ ] auto transliterate button
   - [ ] Some settings options in main app window
-    - [ ] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
-    - [ ] Let user choose whether to have SPC-DEL or DEL-SPC      
+    - [x] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
+    - [x] Let user choose whether to have SPC-DEL or DEL-SPC
     - [ ] Maybe let user turn off QWERTY mode? or switch it to colemak
-    - [ ] 
-
-
-
+    - [ ]
