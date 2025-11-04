@@ -33,6 +33,8 @@ SW2b:
 ⇕	.	,     ␠       ␈     !	?	`
 ```
 
+<img width="563" height="1218" alt="‏لقطة شاشة ٢٠٢٥-١١-٠٤ في ٠٢ ١٣ ٥٢" src="https://github.com/user-attachments/assets/2a1b3467-d1d7-4f2d-9159-f220c31ee3a6" />
+
 <img width="679" height="1306" alt="ss1" src="https://github.com/user-attachments/assets/08fe686d-9919-4b01-81be-b54acf750e70" />
 
 ## 𐑛𐑦𐑝𐑧𐑤𐑩𐑐𐑥𐑩𐑯𐑑
@@ -89,6 +91,7 @@ SW2b:
     - [ ] Figure out swift containers, figure out how setting file should be managed, figure out what settings are realistic to give user control over
     - [ ] Let user choose whether to have SPC-DEL or DEL-SPC      
     - [ ] Maybe let user turn off QWERTY mode? or switch it to colemak
+
 
 
 
