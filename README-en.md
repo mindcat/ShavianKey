@@ -32,7 +32,7 @@ SW2b:
 ⇕	.	,     ␠       ␈     !	?	`
 ```
 
-<img width="679" height="1306" alt="ss1" src="https://github.com/user-attachments/assets/08fe686d-9919-4b01-81be-b54acf750e70" />
+<img width="563" height="1218" alt="‏لقطة شاشة ٢٠٢٥-١١-٠٤ في ٠٢ ١٢ ٣٧" src="https://github.com/user-attachments/assets/dbc03f01-db11-4a50-b20e-4e6f1d47e96a" />
 
 ## Development
 - [ ] MVP
