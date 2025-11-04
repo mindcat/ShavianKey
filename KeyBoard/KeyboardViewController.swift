@@ -99,7 +99,8 @@ struct KeyboardView: View {
     @State private var predictionFlags: [Bool] = [false, false]
     @State private var dictButtonState: DictButtonState = .plus
     
-    
+    @State private var autoTranslate: Bool = false
+    @State private var transliterations: [String] = []
 
     enum DictButtonState {
         case plus         // Word not in dict
@@ -413,6 +414,12 @@ struct KeyboardView: View {
     // qwerty => QWERTY and # => $)
     private func qwertyLayout() -> some View {
         VStack(spacing: 6) {
+            
+            if transliteration {
+                transliterationBar
+            }
+            
+            
             // Row 1
             HStack(spacing: spacing) {
                 ForEach(["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], id: \.self) { key in
@@ -450,76 +457,137 @@ struct KeyboardView: View {
     
     // MARK: - Prediction Bar
         
-        @ViewBuilder
-        private var predictionBar: some View {
-            if proofing {
-                HStack(spacing: 0) {
-                    // Left suggestion (word3)
-                    predictionButton(for: 2)
-                    
-                    verticalDivider
-                    
-                    // Center suggestion (word1 - autocorrect)
-                    predictionButton(for: 0, highlighted: predictionFlags.first ?? false)
-                    
-                    verticalDivider
-                    
-                    // Right suggestion (word2)
-                    predictionButton(for: 1)
-                    
-                    verticalDivider
-                    
-                    // Dictionary status button
-                    dictionaryButton.frame(minWidth: 42)
+    @ViewBuilder
+    private var predictionBar: some View {
+        if proofing {
+            HStack(spacing: 0) {
+                // Left suggestion (word3)
+                predictionButton(for: 2)
+                
+                verticalDivider
+                
+                // Center suggestion (word1 - autocorrect)
+                predictionButton(for: 0, highlighted: predictionFlags.first ?? false)
+                
+                verticalDivider
+                
+                // Right suggestion (word2)
+                predictionButton(for: 1)
+                
+                verticalDivider
+                
+                // Dictionary status button
+                dictionaryButton.frame(minWidth: 42)
+            }
+            .frame(height: 38)
+            .padding(.horizontal, 4)
+            .background(.clear)
+        }
+    }
+    
+    @ViewBuilder
+    private func predictionButton(for index: Int, highlighted: Bool = false) -> some View {
+        let text = (predictions.count > index) ? predictions[index] : ""
+        
+        Button(action: {
+            guard !text.isEmpty else { return }
+            replaceCurrentWord(with: text, addSpace: true)
+        }) {
+            Text(text)
+                .font(.system(size: 16))
+                .foregroundColor(highlighted ? (colorScheme == .dark ? .black : .white) : (colorScheme == .dark ? .white : .black))
+                .padding(.horizontal, 12)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .fill(highlighted ? .blue : .clear)
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(text.isEmpty)
+    }
+    
+    @ViewBuilder
+    private var dictionaryButton: some View {
+        let wordExists = predictionFlags.count > 1 ? predictionFlags[1] : false
+        
+        Button(action: {
+            handleDictButtonTap(wordExists: wordExists)
+        }) {
+            Image(dictButtonImageName(wordExists: wordExists))
+                .frame(maxHeight: .infinity)
+        }
+        .buttonStyle(.plain)
+        // Disable if no word is typed
+        .disabled(currentWord.isEmpty)
+    }
+    
+    private var verticalDivider: some View {
+        Divider()
+            .frame(width: 1, height: 20)
+            .background(colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.2))
+    }
+    
+    // MARK: - Transliteration Bar
+
+    @ViewBuilder
+    private var transliterationBar: some View {
+        // Check the setting from AppStorage
+        if transliteration {
+            HStack(spacing: 8) {
+                // Autotranslate Icon Button
+                Button(action: {
+                    autoTranslate.toggle()
+                    playHaptic(style: .light)
+                }) {
+                    Image(colorScheme == .dark ? "translate.dark" : "translate")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 22, height: 22)
+                        .padding(6)
+                        .background(
+                            // "Liquid glass" glow effect
+                            Circle()
+                                .fill(Color.blue.opacity(autoTranslate ? 0.3 : 0.0))
+                                .animation(.easeInOut, value: autoTranslate)
+                        )
                 }
-                .frame(height: 38)
-                .padding(.horizontal, 4)
-                .background(.clear)
+                .buttonStyle(.plain)
+                
+                // Current Word Display
+                Text("«\(currentWord)»")
+                    .font(.system(size: 16, design: .monospaced))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                
+                // Arrow Separator
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.secondary.opacity(0.5))
+
+                // Scrollable Transliteration Buttons
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(transliterations, id: \.self) { shavianWord in
+                            Button(action: {
+                                replaceCurrentWord(with: shavianWord, addSpace: true)
+                                playHaptic(style: .light)
+                            }) {
+                                Text(shavianWord)
+                                    .font(.custom("InterAlia-Regular", size: 18))
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                                    .padding(.horizontal, 8)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
             }
+            .frame(height: 38)
+            .padding(.horizontal, 4)
         }
-        
-        @ViewBuilder
-        private func predictionButton(for index: Int, highlighted: Bool = false) -> some View {
-            let text = (predictions.count > index) ? predictions[index] : ""
-            
-            Button(action: {
-                guard !text.isEmpty else { return }
-                replaceCurrentWord(with: text + " ")
-            }) {
-                Text(text)
-                    .font(.system(size: 16))
-                    .foregroundColor(highlighted ? (colorScheme == .dark ? .black : .white) : (colorScheme == .dark ? .white : .black))
-                    .padding(.horizontal, 12)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
-                            .fill(highlighted ? .blue : .clear)
-                    )
-            }
-            .buttonStyle(.plain)
-            .disabled(text.isEmpty)
-        }
-        
-        @ViewBuilder
-        private var dictionaryButton: some View {
-            let wordExists = predictionFlags.count > 1 ? predictionFlags[1] : false
-            
-            Button(action: {
-                handleDictButtonTap(wordExists: wordExists)
-            }) {
-                Image(dictButtonImageName(wordExists: wordExists))
-                    .frame(maxHeight: .infinity)
-            }
-            .buttonStyle(.plain)
-            // Disable if no word is typed
-            .disabled(currentWord.isEmpty)
-        }
-        
-        private var verticalDivider: some View {
-            Divider()
-                .frame(width: 1, height: 20)
-                .background(colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.2))
-        }
+    }
     
     // MARK: - Key Buttons
     
@@ -628,13 +696,13 @@ struct KeyboardView: View {
             .background(keyButtonStyle)
             .onTapGesture {
                 textDocumentProxy.deleteBackward()
-                updatePredictions()
+                updateSuggestions()
                 playHaptic(style: .medium)
             }
             .onLongPressGesture(minimumDuration: 0.4, maximumDistance: 10, pressing: { isPressing in
                 if !isPressing {
                     stopDeletingContinuously()
-                    updatePredictions()
+                    updateSuggestions()
                 }
             }, perform: {
                 startDeletingContinuously()
@@ -679,16 +747,19 @@ struct KeyboardView: View {
             .frame(height: 42)
             .background(keyButtonStyle)
             .onTapGesture {
+                let autotranslateActive = transliteration && autoTranslate && !transliterations.isEmpty
                 let autocorrectActive = proofing && (predictionFlags.first ?? false) && !predictions.isEmpty
-                
-                if autocorrectActive {
-                    replaceCurrentWord(with: predictions[0] + " ")
+
+                if autotranslateActive {
+                    replaceCurrentWord(with: transliterations[0], addSpace: true)
+                } else if autocorrectActive {
+                    replaceCurrentWord(with: predictions[0], addSpace: true)
                 } else {
                     insertText(" ")
+                    updateSuggestions();
                 }
-                
+
                 playHaptic(style: .light)
-                updatePredictions()
             }
             .gesture(
                 DragGesture(minimumDistance: 30)
@@ -809,13 +880,14 @@ struct KeyboardView: View {
         self.dictButtonState = wordExists ? .checked : .plus
     }
     
-    private func replaceCurrentWord(with replacement: String) {
+    private func replaceCurrentWord(with replacement: String, addSpace: Bool = true) {
         let wordToReplace = getCurrentWord()
         for _ in 0..<wordToReplace.count {
             textDocumentProxy.deleteBackward()
         }
-        insertText(replacement)
-        updatePredictions()
+        let textToInsert = addSpace ? replacement + " " : replacement
+        insertText(textToInsert)
+        updateSuggestions() // Update all suggestion bars after replacement
     }
     
     private func handleDictButtonTap(wordExists: Bool) {
@@ -848,6 +920,39 @@ struct KeyboardView: View {
         }
     }
     
+    private func updateSuggestions() {
+        updatePredictions()
+        updateTransliterations()
+    }
+
+    private func transliterate(word: String) -> [String] {
+        // --- THIS IS A PLACEHOLDER ---
+        if word.lowercased() == "hello" {
+            return ["𐑣𐑧𐑤𐑴"]
+        }
+        if word.lowercased() == "world" {
+            return ["𐑢𐑻𐑤𐑛", "𐑢𐑻𐑤𐑛"]
+        }
+        if word.lowercased() == "shavian" {
+            return ["·𐑖𐑱𐑝𐑾𐑯", "𐑖𐑱𐑝𐑾𐑯"]
+        }
+
+        return []
+    }
+
+    private func updateTransliterations() {
+        guard transliteration else { return }
+        let word = getCurrentWord()
+
+        if word.isEmpty {
+            self.transliterations = []
+            return
+        }
+
+        let results = transliterate(word: word)
+        self.transliterations = results
+    }
+    
     private func handleKeyTap(_ key: String, altKey: String?) {
         let now = Date()
         let timeSinceLastTap = now.timeIntervalSince(lastTapTime)
@@ -861,7 +966,7 @@ struct KeyboardView: View {
             insertText(key)
             playHaptic(style: .light)
         }
-        updatePredictions()
+        updateSuggestions()
         lastTapTime = now
         lastTapButton = key
     }
@@ -930,7 +1035,7 @@ struct KeyboardView: View {
         deleteTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             if self.isDeleting {
                 self.textDocumentProxy.deleteBackward()
-                self.updatePredictions()
+                self.updateSuggestions()
                 self.playHaptic(style: .light)
             } else {
                 self.deleteTimer?.invalidate()
